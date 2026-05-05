@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Shop - Welcome To Dino Shop</title>
+    <title>Dino Shop - Official</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -15,78 +15,65 @@
             --text-main: #c9d1d9;
             --text-bright: #ffffff;
             --admin-gold: #f2c94c;
+            --danger: #ff4b4b;
         }
 
         body {
             font-family: 'Kanit', sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
-            margin: 0;
-            padding-bottom: 100px;
+            margin: 0; padding-bottom: 80px;
         }
 
-        /* Header */
         header {
             background-color: var(--bg-card);
-            padding: 10px 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 12px 5%;
+            display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #30363d;
             position: sticky; top: 0; z-index: 1000;
         }
 
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        #shop-logo { width: 45px; height: 45px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary-blue); display: none; }
-        .logo-text { font-size: 22px; font-weight: 600; color: var(--primary-blue); }
+        .logo-container { display: flex; align-items: center; gap: 12px; }
+        #shop-logo { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary-blue); display: none; }
+        .logo-text { font-size: 20px; font-weight: 600; color: var(--primary-blue); text-transform: uppercase; }
 
-        .nav-right { display: flex; gap: 15px; align-items: center; }
         .balance-box {
             background: rgba(88, 166, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--primary-blue);
-            color: var(--primary-blue);
+            padding: 6px 15px; border-radius: 8px;
+            border: 1px solid var(--primary-blue); color: var(--primary-blue);
         }
 
-        /* Admin Section - Hidden by default */
+        .container { width: 92%; max-width: 1200px; margin: 30px auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+
         #admin-panel {
-            display: none;
-            background: #1c2128;
-            padding: 25px;
-            border-radius: 12px;
-            border: 2px solid var(--admin-gold);
-            margin-bottom: 40px;
-            animation: fadeIn 0.5s;
+            display: none; background: #1c2128; padding: 25px;
+            border-radius: 12px; border: 2px solid var(--admin-gold); margin-bottom: 30px;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Grid & Cards */
-        .container { width: 90%; max-width: 1200px; margin: 30px auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; margin-top: 20px; }
-        
         .product-card {
-            background: var(--bg-card);
-            border: 1px solid #30363d;
-            border-radius: 12px;
-            overflow: hidden;
-            transition: 0.3s;
+            background: var(--bg-card); border: 1px solid #30363d;
+            border-radius: 12px; overflow: hidden; transition: 0.3s;
         }
         .product-card:hover { transform: translateY(-5px); border-color: var(--primary-blue); }
-        .product-img { width: 100%; height: 200px; object-fit: cover; background: #21262d; }
+        .product-img { width: 100%; height: 180px; object-fit: cover; background: #21262d; }
         .product-info { padding: 15px; }
-        .price-tag { font-size: 22px; color: #58a6ff; font-weight: 600; margin: 10px 0; }
+        .price-tag { font-size: 22px; color: var(--primary-blue); font-weight: 600; margin: 8px 0; }
 
-        /* UI Elements */
         .btn {
-            background: var(--accent-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: 'Kanit';
+            background: var(--accent-blue); color: white; border: none;
+            padding: 10px 18px; border-radius: 6px; cursor: pointer; font-family: 'Kanit';
         }
-        .btn-admin { background: #30363d; border: 1px solid #444c56; font-size: 14px; }
-        .btn-logout { background: #da3633; margin-top: 10px; }
+        .btn-gold { background: var(--admin-gold); color: black; font-weight: bold; }
         
         input {
-            width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: white; box-sizing: border-box; margin-bottom: 10px;
+            width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d;
+            border-radius: 6px; color: white; margin-bottom: 10px; box-sizing: border-box;
+        }
+
+        .bank-info-box {
+            background: #0d1117; padding: 20px; border-radius: 10px; border: 2px solid var(--primary-blue);
+            margin: 10px 0; text-align: center;
         }
     </style>
 </head>
@@ -97,147 +84,190 @@
         <img id="shop-logo" src="" alt="logo">
         <span class="logo-text" id="display-shop-name">MY SHOP</span>
     </div>
-    <div class="nav-right">
-        <div class="balance-box">ยอดเงิน: <span id="balance">0</span> ฿</div>
-        <button class="btn btn-admin" id="login-btn" onclick="adminLogin()">แอดมินล็อกอิน</button>
-        <button class="btn btn-logout" id="logout-btn" onclick="adminLogout()" style="display:none;">ออกจากระบบ</button>
+    <div style="display: flex; gap: 10px;">
+        <div class="balance-box">฿ <span id="balance">0</span></div>
+        <button class="btn" style="background:#30363d" id="login-btn" onclick="adminLogin()">Admin</button>
+        <button class="btn" id="logout-btn" onclick="adminLogout()" style="display:none; background:#da3633">Logout</button>
     </div>
 </header>
 
 <div class="container">
     
-    <!-- Admin Zone (Hidden) -->
+    <!-- แผงแอดมิน -->
     <section id="admin-panel">
-        <h3 style="margin-top:0; color: var(--admin-gold);">⭐ แผงควบคุมแอดมิน</h3>
-        <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
+        <h3 style="color: var(--admin-gold); margin-top:0;">🛡️ แผงควบคุมแอดมิน</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div>
-                <label>เปลี่ยนชื่อร้าน:</label>
-                <input type="text" id="input-shop-name" placeholder="ระบุชื่อร้าน" onchange="updateShopName()">
-                <label>โลโก้ร้าน:</label>
+                <strong style="color:white">ตั้งค่าร้านค้า:</strong>
+                <input type="text" id="input-shop-name" placeholder="ชื่อร้าน" onchange="updateShopName()">
+                <label>เปลี่ยนโลโก้ร้าน:</label>
                 <input type="file" accept="image/*" onchange="previewLogo(event)">
             </div>
             <div>
-                <label>เพิ่มสินค้าใหม่:</label>
+                <strong style="color:white">เพิ่มสินค้าใหม่:</strong>
                 <input type="text" id="p-name" placeholder="ชื่อสินค้า">
                 <input type="number" id="p-price" placeholder="ราคา">
+                <input type="text" id="p-discord" placeholder="ลิงก์ Discord">
                 <input type="file" id="p-img" accept="image/*">
-                <button class="btn" style="width:100%; background: var(--admin-gold); color: black; font-weight: bold;" onclick="addProduct()">เพิ่มสินค้าลงหน้าร้าน</button>
+                <button class="btn btn-gold" style="width:100%" onclick="addProduct()">ลงขายสินค้า</button>
             </div>
         </div>
     </section>
 
     <h2>🛒 รายการสินค้า</h2>
-    <div class="grid" id="product-display">
-        <!-- สินค้าเริ่มต้น -->
-    </div>
+    <div class="grid" id="product-display"></div>
 
-    <!-- ส่วนของลูกค้า: เติมเงิน -->
-    <div style="margin-top: 60px; text-align: center; background: var(--bg-card); padding: 30px; border-radius: 15px; border: 1px dashed var(--primary-blue);">
-        <h3>💳 เติมเงินผ่านสลิป</h3>
-        <button class="btn" style="background:none; border:1px solid #58a6ff; color:#58a6ff; margin-bottom:15px;" onclick="Swal.fire('ข้อมูลธนาคาร', 'กสิกรไทย: 230-3-21237-2', 'info')">คลิกเพื่อดูเลขบัญชี</button>
+    <!-- ระบบเติมเงิน -->
+    <div style="margin-top: 50px; text-align: center; background: var(--bg-card); padding: 40px; border-radius: 15px; border: 1px dashed #444;">
+        <h2 style="margin-top:0">💰 ระบบเติมเงิน</h2>
+        <button class="btn" style="background:#238636; margin-bottom:20px; font-size:18px; box-shadow: 0 0 10px rgba(35,134,54,0.5);" onclick="showBankInfo()">
+            📥 คลิกที่นี่เพื่อดูเลขบัญชีโอนเงิน
+        </button>
         <br>
-        <input type="file" id="slip" style="max-width: 300px;">
+        <p style="font-size: 14px; color: #8b949e;">เมื่อโอนเงินเสร็จแล้ว กรุณาแนบรูปสลิปด้านล่าง</p>
+        <input type="file" id="slip" style="max-width: 280px;">
         <br>
-        <button class="btn" onclick="topup()">ยืนยันการเติมเงิน</button>
+        <button class="btn" onclick="topup()">ยืนยันและส่งสลิป</button>
     </div>
 </div>
 
 <script>
-    let balance = 0;
-    const ADMIN_PASS = "2212";
+    let userBalance = 0;
+    const ADMIN_CODE = "2212";
 
-    // 1. ระบบล็อกอินแอดมิน
-    async function adminLogin() {
-        const { value: password } = await Swal.fire({
-            title: 'กรอกรหัสผ่านแอดมิน',
+    // ข้อมูลบัญชีของคุณศิรวิทย์ (ฝังไว้ถาวร)
+    const bankInfo = {
+        number: "230-3-21237-2",
+        name: "นายศิรวิทย์ ปัญจะมี"
+    };
+
+    function adminLogin() {
+        Swal.fire({
+            title: 'รหัสผ่านแอดมิน',
             input: 'password',
-            inputPlaceholder: 'Password',
-            inputAttributes: { autocapitalize: 'off', autocorrect: 'off' }
+            showCancelButton: true
+        }).then((result) => {
+            if (result.value === ADMIN_CODE) {
+                document.getElementById('admin-panel').style.display = 'block';
+                document.getElementById('login-btn').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'block';
+            } else if (result.value) {
+                Swal.fire('ผิด!', 'รหัสผ่านไม่ถูกต้อง', 'error');
+            }
         });
-
-        if (password === ADMIN_PASS) {
-            Swal.fire('สำเร็จ', 'ยินดีต้อนรับแอดมิน', 'success');
-            document.getElementById('admin-panel').style.display = 'block';
-            document.getElementById('login-btn').style.display = 'none';
-            document.getElementById('logout-btn').style.display = 'block';
-        } else if (password) {
-            Swal.fire('ผิดพลาด', 'รหัสผ่านไม่ถูกต้อง!', 'error');
-        }
     }
 
     function adminLogout() {
         document.getElementById('admin-panel').style.display = 'none';
         document.getElementById('login-btn').style.display = 'block';
         document.getElementById('logout-btn').style.display = 'none';
-        Swal.fire('Logout', 'ออกจากระบบแอดมินแล้ว', 'info');
     }
 
-    // 2. จัดการชื่อร้าน/โลโก้
     function updateShopName() {
-        const name = document.getElementById('input-shop-name').value;
-        document.getElementById('display-shop-name').innerText = name || "MY SHOP";
+        document.getElementById('display-shop-name').innerText = document.getElementById('input-shop-name').value || "Dino SHOP";
     }
 
     function previewLogo(event) {
         const reader = new FileReader();
-        reader.onload = function() {
-            const output = document.getElementById('shop-logo');
-            output.src = reader.result;
-            output.style.display = 'block';
+        reader.onload = () => {
+            const img = document.getElementById('shop-logo');
+            img.src = reader.result;
+            img.style.display = 'block';
         };
         reader.readAsDataURL(event.target.files[0]);
     }
 
-    // 3. เพิ่มสินค้า
     function addProduct() {
         const name = document.getElementById('p-name').value;
         const price = document.getElementById('p-price').value;
+        const discord = document.getElementById('p-discord').value;
         const imgInput = document.getElementById('p-img');
 
-        if(!name || !price || !imgInput.files[0]) {
-            Swal.fire('เตือน', 'กรอกข้อมูลสินค้าให้ครบ', 'warning');
-            return;
+        if(!name || !price || !discord || !imgInput.files[0]) {
+            return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วน', 'warning');
         }
 
         const reader = new FileReader();
-        reader.onload = function() {
-            const container = document.getElementById('product-display');
-            container.innerHTML += `
+        reader.onload = () => {
+            document.getElementById('product-display').innerHTML += `
                 <div class="product-card">
                     <img src="${reader.result}" class="product-img">
                     <div class="product-info">
-                        <div style="font-weight:600; font-size:18px;">${name}</div>
+                        <div style="font-weight:600; color:white;">${name}</div>
                         <div class="price-tag">${parseFloat(price).toLocaleString()} ฿</div>
-                        <button class="btn" style="width:100%" onclick="buy(${price}, '${name}')">ซื้อสินค้า</button>
+                        <button class="btn" style="width:100%" onclick="handlePurchase(${price}, '${name}', '${discord}')">ซื้อสินค้า</button>
                     </div>
                 </div>
             `;
-            Swal.fire('เรียบร้อย', 'เพิ่มสินค้าใหม่แล้ว', 'success');
+            Swal.fire('สำเร็จ', 'เพิ่มสินค้าใหม่แล้ว', 'success');
         };
         reader.readAsDataURL(imgInput.files[0]);
     }
 
-    // 4. ระบบเติมเงิน & ซื้อ
-    function topup() {
-        if(!document.getElementById('slip').files[0]) {
-            Swal.fire('หือ?', 'ลืมแนบสลิปหรือเปล่าครับ?', 'question');
-            return;
-        }
-        Swal.fire({ title: 'ตรวจสอบสลิป...', timer: 1500, didOpen: () => Swal.showLoading() }).then(() => {
-            balance += 1000;
-            document.getElementById('balance').innerText = balance.toLocaleString();
-            Swal.fire('สำเร็จ', 'ยอดเงินเข้า 1,000 ฿', 'success');
+    // ฟังก์ชันแสดงเลขบัญชี
+    function showBankInfo() {
+        Swal.fire({
+            title: 'ช่องทางการโอนเงิน',
+            html: `
+                <div class="bank-info-box">
+                    <p style="color:#58a6ff; font-size:16px; margin-bottom:5px;"><b>ธนาคารกสิกรไทย (KBANK)</b></p>
+                    <p style="font-size:26px; color:white; margin:10px 0; letter-spacing: 2px;"><b>${bankInfo.number}</b></p>
+                    <p style="color:#8b949e; font-size:18px;"><b>ชื่อบัญชี:</b> ${bankInfo.name}</p>
+                </div>
+                <p style="font-size:13px; color:#ff4b4b;">*ตรวจสอบชื่อบัญชีให้ถูกต้องก่อนโอนทุกครั้ง</p>
+            `,
+            confirmButtonText: 'รับทราบ',
+            confirmButtonColor: '#1f6feb'
         });
     }
 
-    function buy(cost, title) {
-        if(balance < cost) {
-            Swal.fire('เงินไม่พอ', 'กรุณาเติมเงินก่อนซื้อ ' + title, 'error');
-        } else {
-            balance -= cost;
-            document.getElementById('balance').innerText = balance.toLocaleString();
-            Swal.fire('ขอบคุณครับ', 'คุณซื้อ ' + title + ' สำเร็จ', 'success');
+    function handlePurchase(cost, name, discordLink) {
+        if (userBalance < cost) {
+            return Swal.fire('ยอดเงินไม่พอ', 'กรุณาเติมเงินก่อนซื้อสินค้า', 'error');
         }
+
+        Swal.fire({
+            title: 'ยืนยันการชำระเงิน?',
+            text: `ต้องการซื้อ ${name} ราคา ${cost} บาท?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยัน'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                userBalance -= cost;
+                document.getElementById('balance').innerText = userBalance.toLocaleString();
+
+                Swal.fire({
+                    title: '<span style="color:#ff4b4b">⚠️ สำคัญมาก กรุณาอ่าน!</span>',
+                    html: `
+                        <div style="text-align: left; background: #2a1b1b; color: #ffbaba; padding: 15px; border-radius: 8px; border: 1px solid var(--danger);">
+                            <p><b>1. เมื่อเข้าเซิร์ฟเวอร์แล้ว ให้เข้าเพียง 1 แอคเคาท์เท่านั้น</b></p>
+                            <p><b>2. เพื่อให้ทางร้านโอนหัวได้ถูกต้องตามรายการ</b></p>
+                            <hr style="border:0.5px solid #ff4b4b">
+                            <p style="color: #ffffff; font-weight: bold; background: #ff4b4b; padding: 8px; text-align:center; border-radius: 4px;">
+                                *หากลูกค้าเข้าหลายแอคแล้วร้านโอนผิด ร้านไม่รับผิดชอบทุกกรณี!
+                            </p>
+                        </div>
+                        <br>
+                        <p>คลิกด้านล่างเพื่อรับสินค้า:</p>
+                        <a href="${discordLink}" target="_blank" style="display:inline-block; background:#5865F2; color:white; padding:12px 30px; border-radius:8px; text-decoration:none; font-weight:600; box-shadow: 0 4px 15px rgba(88,101,242,0.4);">
+                            เข้าสู่ DISCORD รับสินค้า
+                        </a>
+                    `,
+                    icon: 'success',
+                    allowOutsideClick: false
+                });
+            }
+        });
+    }
+
+    function topup() {
+        if(!document.getElementById('slip').files[0]) {
+            return Swal.fire('แจ้งเตือน', 'กรุณาแนบสลิปก่อนยืนยัน', 'warning');
+        }
+        userBalance += 1000;
+        document.getElementById('balance').innerText = userBalance.toLocaleString();
+        Swal.fire('สำเร็จ', 'ส่งสลิปเรียบร้อย เติมเงินสำเร็จ 1,000 ฿ (จำลอง)', 'success');
     }
 </script>
 
