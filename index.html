@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Shop - Official</title>
+    <title>Dino Shop - Welcome to Dino Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -46,6 +46,7 @@
         .container { width: 92%; max-width: 1200px; margin: 30px auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
 
+        /* แผงแอดมิน (ซ่อนไว้สำหรับเจ้าของร้าน) */
         #admin-panel {
             display: none; background: #1c2128; padding: 25px;
             border-radius: 12px; border: 2px solid var(--admin-gold); margin-bottom: 30px;
@@ -93,66 +94,65 @@
 
 <div class="container">
     
-    <!-- แผงแอดมิน -->
+    <!-- ADMIN ZONE (ซ่อนอยู่) -->
     <section id="admin-panel">
-        <h3 style="color: var(--admin-gold); margin-top:0;">🛡️ แผงควบคุมแอดมิน</h3>
+        <h3 style="color: var(--admin-gold); margin-top:0;">🛡️ สำหรับเจ้าของร้าน (Admin)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div>
-                <strong style="color:white">ตั้งค่าร้านค้า:</strong>
+                <strong>ตั้งค่าร้าน:</strong>
                 <input type="text" id="input-shop-name" placeholder="ชื่อร้าน" onchange="updateShopName()">
-                <label>เปลี่ยนโลโก้ร้าน:</label>
+                <label>รูปโลโก้:</label>
                 <input type="file" accept="image/*" onchange="previewLogo(event)">
             </div>
             <div>
-                <strong style="color:white">เพิ่มสินค้าใหม่:</strong>
+                <strong>ลงสินค้าใหม่ (จะโชว์หน้าเว็บทันที):</strong>
                 <input type="text" id="p-name" placeholder="ชื่อสินค้า">
                 <input type="number" id="p-price" placeholder="ราคา">
                 <input type="text" id="p-discord" placeholder="ลิงก์ Discord">
                 <input type="file" id="p-img" accept="image/*">
-                <button class="btn btn-gold" style="width:100%" onclick="addProduct()">ลงขายสินค้า</button>
+                <button class="btn btn-gold" style="width:100%" onclick="addProduct()">เพิ่มสินค้าลงหน้าร้าน</button>
+                <button class="btn" style="width:100%; background:gray; margin-top:5px" onclick="clearAllProducts()">ลบสินค้าทั้งหมด</button>
             </div>
         </div>
     </section>
 
-    <h2>🛒 รายการสินค้า</h2>
+    <h2>🛒 สินค้าที่มีจำหน่าย</h2>
+    <!-- ส่วนนี้ที่คนทั่วไปจะเห็นและซื้อได้เลย -->
     <div class="grid" id="product-display"></div>
 
-    <!-- ระบบเติมเงิน -->
     <div style="margin-top: 50px; text-align: center; background: var(--bg-card); padding: 40px; border-radius: 15px; border: 1px dashed #444;">
-        <h2 style="margin-top:0">💰 ระบบเติมเงิน</h2>
-        <button class="btn" style="background:#238636; margin-bottom:20px; font-size:18px; box-shadow: 0 0 10px rgba(35,134,54,0.5);" onclick="showBankInfo()">
-            📥 คลิกที่นี่เพื่อดูเลขบัญชีโอนเงิน
+        <h2 style="margin-top:0">💰 ช่องทางเติมเงิน</h2>
+        <button class="btn" style="background:#238636; margin-bottom:20px; font-size:18px;" onclick="showBankInfo()">
+            📥 ดูเลขบัญชีโอนเงิน
         </button>
         <br>
-        <p style="font-size: 14px; color: #8b949e;">เมื่อโอนเงินเสร็จแล้ว กรุณาแนบรูปสลิปด้านล่าง</p>
         <input type="file" id="slip" style="max-width: 280px;">
-        <br>
-        <button class="btn" onclick="topup()">ยืนยันและส่งสลิป</button>
+        <button class="btn" onclick="topup()">ยืนยันสลิป</button>
     </div>
 </div>
 
 <script>
-    let userBalance = 0;
+    let userBalance = parseFloat(localStorage.getItem('userBalance')) || 0;
+    let savedProducts = JSON.parse(localStorage.getItem('shopProducts')) || [];
     const ADMIN_CODE = "2212";
 
-    // ข้อมูลบัญชีของคุณศิรวิทย์ (ฝังไว้ถาวร)
     const bankInfo = {
         number: "230-3-21237-2",
         name: "นายศิรวิทย์ ปัญจะมี"
     };
 
+    // แสดงผลยอดเงินและสินค้าเมื่อโหลดหน้าเว็บ
+    window.onload = () => {
+        updateBalanceDisplay();
+        renderProducts();
+    };
+
     function adminLogin() {
-        Swal.fire({
-            title: 'รหัสผ่านแอดมิน',
-            input: 'password',
-            showCancelButton: true
-        }).then((result) => {
-            if (result.value === ADMIN_CODE) {
+        Swal.fire({ title: 'Admin Password', input: 'password' }).then(res => {
+            if (res.value === ADMIN_CODE) {
                 document.getElementById('admin-panel').style.display = 'block';
                 document.getElementById('login-btn').style.display = 'none';
                 document.getElementById('logout-btn').style.display = 'block';
-            } else if (result.value) {
-                Swal.fire('ผิด!', 'รหัสผ่านไม่ถูกต้อง', 'error');
             }
         });
     }
@@ -163,111 +163,95 @@
         document.getElementById('logout-btn').style.display = 'none';
     }
 
-    function updateShopName() {
-        document.getElementById('display-shop-name').innerText = document.getElementById('input-shop-name').value || "Dino SHOP";
-    }
-
-    function previewLogo(event) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            const img = document.getElementById('shop-logo');
-            img.src = reader.result;
-            img.style.display = 'block';
-        };
-        reader.readAsDataURL(event.target.files[0]);
-    }
-
     function addProduct() {
         const name = document.getElementById('p-name').value;
         const price = document.getElementById('p-price').value;
         const discord = document.getElementById('p-discord').value;
         const imgInput = document.getElementById('p-img');
 
-        if(!name || !price || !discord || !imgInput.files[0]) {
-            return Swal.fire('ข้อมูลไม่ครบ', 'กรุณากรอกข้อมูลสินค้าให้ครบถ้วน', 'warning');
-        }
+        if(!name || !price || !discord || !imgInput.files[0]) return Swal.fire('เตือน','กรอกข้อมูลให้ครบ','warning');
 
         const reader = new FileReader();
         reader.onload = () => {
-            document.getElementById('product-display').innerHTML += `
-                <div class="product-card">
-                    <img src="${reader.result}" class="product-img">
-                    <div class="product-info">
-                        <div style="font-weight:600; color:white;">${name}</div>
-                        <div class="price-tag">${parseFloat(price).toLocaleString()} ฿</div>
-                        <button class="btn" style="width:100%" onclick="handlePurchase(${price}, '${name}', '${discord}')">ซื้อสินค้า</button>
-                    </div>
-                </div>
-            `;
-            Swal.fire('สำเร็จ', 'เพิ่มสินค้าใหม่แล้ว', 'success');
+            const newProduct = { name, price, discord, img: reader.result };
+            savedProducts.push(newProduct);
+            localStorage.setItem('shopProducts', JSON.stringify(savedProducts));
+            renderProducts(); // วาดรายการสินค้าใหม่ทันที
+            Swal.fire('สำเร็จ','สินค้าขึ้นหน้าร้านแล้ว!','success');
         };
         reader.readAsDataURL(imgInput.files[0]);
     }
 
-    // ฟังก์ชันแสดงเลขบัญชี
+    // ฟังก์ชันวาดรายการสินค้า (คนทั่วไปจะเห็นส่วนนี้)
+    function renderProducts() {
+        const display = document.getElementById('product-display');
+        display.innerHTML = '';
+        savedProducts.forEach((p, index) => {
+            display.innerHTML += `
+                <div class="product-card">
+                    <img src="${p.img}" class="product-img">
+                    <div class="product-info">
+                        <div style="font-weight:600; color:white;">${p.name}</div>
+                        <div class="price-tag">${parseFloat(p.price).toLocaleString()} ฿</div>
+                        <button class="btn" style="width:100%" onclick="handlePurchase(${p.price}, '${p.name}', '${p.discord}')">ซื้อสินค้า</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function clearAllProducts() {
+        Swal.fire({ title: 'ลบทั้งหมด?', showCancelButton: true }).then(res => {
+            if(res.isConfirmed) {
+                savedProducts = [];
+                localStorage.removeItem('shopProducts');
+                renderProducts();
+            }
+        });
+    }
+
     function showBankInfo() {
         Swal.fire({
-            title: 'ช่องทางการโอนเงิน',
-            html: `
-                <div class="bank-info-box">
-                    <p style="color:#58a6ff; font-size:16px; margin-bottom:5px;"><b>ธนาคารกสิกรไทย (KBANK)</b></p>
-                    <p style="font-size:26px; color:white; margin:10px 0; letter-spacing: 2px;"><b>${bankInfo.number}</b></p>
-                    <p style="color:#8b949e; font-size:18px;"><b>ชื่อบัญชี:</b> ${bankInfo.name}</p>
-                </div>
-                <p style="font-size:13px; color:#ff4b4b;">*ตรวจสอบชื่อบัญชีให้ถูกต้องก่อนโอนทุกครั้ง</p>
-            `,
-            confirmButtonText: 'รับทราบ',
-            confirmButtonColor: '#1f6feb'
+            title: 'โอนเงินที่นี่',
+            html: `<div class="bank-info-box"><b>กสิกรไทย</b><br><h2 style="color:white">${bankInfo.number}</h2><b>${bankInfo.name}</b></div>`
         });
     }
 
     function handlePurchase(cost, name, discordLink) {
-        if (userBalance < cost) {
-            return Swal.fire('ยอดเงินไม่พอ', 'กรุณาเติมเงินก่อนซื้อสินค้า', 'error');
-        }
-
-        Swal.fire({
-            title: 'ยืนยันการชำระเงิน?',
-            text: `ต้องการซื้อ ${name} ราคา ${cost} บาท?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'ยืนยัน'
-        }).then((result) => {
-            if (result.isConfirmed) {
+        if (userBalance < cost) return Swal.fire('เงินไม่พอ','กรุณาเติมเงินก่อนครับ','error');
+        
+        Swal.fire({ title: 'ซื้อสินค้า?', text: `ยืนยันซื้อ ${name}`, showCancelButton: true }).then(res => {
+            if(res.isConfirmed) {
                 userBalance -= cost;
-                document.getElementById('balance').innerText = userBalance.toLocaleString();
-
+                updateBalanceDisplay();
                 Swal.fire({
-                    title: '<span style="color:#ff4b4b">⚠️ สำคัญมาก กรุณาอ่าน!</span>',
-                    html: `
-                        <div style="text-align: left; background: #2a1b1b; color: #ffbaba; padding: 15px; border-radius: 8px; border: 1px solid var(--danger);">
-                            <p><b>1. เมื่อเข้าเซิร์ฟเวอร์แล้ว ให้เข้าเพียง 1 แอคเคาท์เท่านั้น</b></p>
-                            <p><b>2. เพื่อให้ทางร้านโอนหัวได้ถูกต้องตามรายการ</b></p>
-                            <hr style="border:0.5px solid #ff4b4b">
-                            <p style="color: #ffffff; font-weight: bold; background: #ff4b4b; padding: 8px; text-align:center; border-radius: 4px;">
-                                *หากลูกค้าเข้าหลายแอคแล้วร้านโอนผิด ร้านไม่รับผิดชอบทุกกรณี!
-                            </p>
-                        </div>
-                        <br>
-                        <p>คลิกด้านล่างเพื่อรับสินค้า:</p>
-                        <a href="${discordLink}" target="_blank" style="display:inline-block; background:#5865F2; color:white; padding:12px 30px; border-radius:8px; text-decoration:none; font-weight:600; box-shadow: 0 4px 15px rgba(88,101,242,0.4);">
-                            เข้าสู่ DISCORD รับสินค้า
-                        </a>
-                    `,
-                    icon: 'success',
-                    allowOutsideClick: false
+                    title: 'สำเร็จ! อ่านคำเตือนสำคัญ',
+                    html: `<div style="background:#2a1b1b; color:#ffbaba; padding:15px; border-radius:8px; border:1px solid red; text-align:left;">
+                            <b>1. เข้าเพียง 1 แอคเคาท์เท่านั้น</b><br>
+                            <b>2. เพื่อให้ร้านโอนหัวได้ถูก</b><br><br>
+                            <center><b style="color:white; background:red; padding:5px;">*หากเข้าหลายแอคแล้วโอนผิด ร้านไม่รับผิดชอบ!</b></center>
+                           </div><br>
+                           <a href="${discordLink}" target="_blank" style="display:inline-block; background:#5865F2; color:white; padding:10px 20px; text-decoration:none; border-radius:5px;">เข้า DISCORD รับสินค้า</a>`,
+                    icon: 'success'
                 });
             }
         });
     }
 
     function topup() {
-        if(!document.getElementById('slip').files[0]) {
-            return Swal.fire('แจ้งเตือน', 'กรุณาแนบสลิปก่อนยืนยัน', 'warning');
-        }
+        if(!document.getElementById('slip').files[0]) return Swal.fire('เตือน','แนบสลิปก่อน','warning');
         userBalance += 1000;
+        updateBalanceDisplay();
+        Swal.fire('สำเร็จ','เติมเงินสำเร็จ (จำลอง 1,000)','success');
+    }
+
+    function updateBalanceDisplay() {
         document.getElementById('balance').innerText = userBalance.toLocaleString();
-        Swal.fire('สำเร็จ', 'ส่งสลิปเรียบร้อย เติมเงินสำเร็จ 1,000 ฿ (จำลอง)', 'success');
+        localStorage.setItem('userBalance', userBalance);
+    }
+
+    function updateShopName() {
+        document.getElementById('display-shop-name').innerText = document.getElementById('input-shop-name').value;
     }
 </script>
 
