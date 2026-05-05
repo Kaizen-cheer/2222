@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dino Shop - ยินดีต้อนรับครับ</title>
+    <title>Dino Shop - Welcome To Dino Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -14,6 +14,7 @@
             --accent-blue: #1f6feb;
             --text-main: #c9d1d9;
             --text-bright: #ffffff;
+            --admin-gold: #f2c94c;
         }
 
         body {
@@ -36,9 +37,10 @@
         }
 
         .logo-container { display: flex; align-items: center; gap: 15px; }
-        #shop-logo { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--primary-blue); display: none; }
+        #shop-logo { width: 45px; height: 45px; object-fit: cover; border-radius: 50%; border: 2px solid var(--primary-blue); display: none; }
         .logo-text { font-size: 22px; font-weight: 600; color: var(--primary-blue); }
 
+        .nav-right { display: flex; gap: 15px; align-items: center; }
         .balance-box {
             background: rgba(88, 166, 255, 0.1);
             padding: 8px 15px;
@@ -47,11 +49,23 @@
             color: var(--primary-blue);
         }
 
-        /* Main Layout */
-        .container { width: 90%; max-width: 1200px; margin: 30px auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; margin-top: 20px; }
+        /* Admin Section - Hidden by default */
+        #admin-panel {
+            display: none;
+            background: #1c2128;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid var(--admin-gold);
+            margin-bottom: 40px;
+            animation: fadeIn 0.5s;
+        }
 
-        /* Card Style */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Grid & Cards */
+        .container { width: 90%; max-width: 1200px; margin: 30px auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; margin-top: 20px; }
+        
         .product-card {
             background: var(--bg-card);
             border: 1px solid #30363d;
@@ -64,24 +78,16 @@
         .product-info { padding: 15px; }
         .price-tag { font-size: 22px; color: #58a6ff; font-weight: 600; margin: 10px 0; }
 
-        /* Admin/Form Styles */
-        .admin-panel {
-            background: #1c2128;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #444c56;
-            margin-bottom: 40px;
-        }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: var(--text-bright); }
-        input[type="text"], input[type="number"], input[type="file"] {
-            width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: white; box-sizing: border-box;
-        }
+        /* UI Elements */
         .btn {
             background: var(--accent-blue); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-family: 'Kanit';
         }
-        .btn:hover { background: #388bfd; }
-        .btn-topup { background: transparent; border: 1px solid var(--primary-blue); color: var(--primary-blue); margin-top: 10px; }
+        .btn-admin { background: #30363d; border: 1px solid #444c56; font-size: 14px; }
+        .btn-logout { background: #da3633; margin-top: 10px; }
+        
+        input {
+            width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: white; box-sizing: border-box; margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -91,60 +97,87 @@
         <img id="shop-logo" src="" alt="logo">
         <span class="logo-text" id="display-shop-name">MY SHOP</span>
     </div>
-    <div class="balance-box">เงินของคุณ: <span id="balance">0</span> ฿</div>
+    <div class="nav-right">
+        <div class="balance-box">ยอดเงิน: <span id="balance">0</span> ฿</div>
+        <button class="btn btn-admin" id="login-btn" onclick="adminLogin()">แอดมินล็อกอิน</button>
+        <button class="btn btn-logout" id="logout-btn" onclick="adminLogout()" style="display:none;">ออกจากระบบ</button>
+    </div>
 </header>
 
 <div class="container">
     
-    <!-- ส่วนจัดการหลังบ้าน (สมมติว่าเป็นเจ้าของร้าน) -->
-    <section class="admin-panel">
-        <h3 style="margin-top:0; color: var(--primary-blue);">⚙️ ตั้งค่าร้านค้า & เพิ่มสินค้า</h3>
+    <!-- Admin Zone (Hidden) -->
+    <section id="admin-panel">
+        <h3 style="margin-top:0; color: var(--admin-gold);">⭐ แผงควบคุมแอดมิน</h3>
         <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
-                <label>ชื่อร้าน:</label>
-                <input type="text" id="input-shop-name" placeholder="ชื่อร้านของคุณ" onchange="updateShopName()">
-                <label style="margin-top:10px;">อัปโหลดโลโก้ร้าน:</label>
+                <label>เปลี่ยนชื่อร้าน:</label>
+                <input type="text" id="input-shop-name" placeholder="ระบุชื่อร้าน" onchange="updateShopName()">
+                <label>โลโก้ร้าน:</label>
                 <input type="file" accept="image/*" onchange="previewLogo(event)">
             </div>
             <div>
-                <label>ชื่อสินค้าที่จะเพิ่ม:</label>
-                <input type="text" id="p-name" placeholder="เช่น ดาบในตำนาน">
-                <label style="margin-top:10px;">ราคา (บาท):</label>
-                <input type="number" id="p-price" placeholder="100">
-                <label style="margin-top:10px;">รูปภาพสินค้า:</label>
+                <label>เพิ่มสินค้าใหม่:</label>
+                <input type="text" id="p-name" placeholder="ชื่อสินค้า">
+                <input type="number" id="p-price" placeholder="ราคา">
                 <input type="file" id="p-img" accept="image/*">
-                <button class="btn" style="margin-top:15px; width:100%" onclick="addProduct()">➕ เพิ่มสินค้าลงหน้าร้าน</button>
+                <button class="btn" style="width:100%; background: var(--admin-gold); color: black; font-weight: bold;" onclick="addProduct()">เพิ่มสินค้าลงหน้าร้าน</button>
             </div>
         </div>
     </section>
 
-    <hr style="border: 0.5px solid #30363d; margin: 40px 0;">
-
-    <h2>🛒 สินค้าทั้งหมด</h2>
+    <h2>🛒 รายการสินค้า</h2>
     <div class="grid" id="product-display">
-        <!-- สินค้าจะมาโผล่ตรงนี้ -->
+        <!-- สินค้าเริ่มต้น -->
     </div>
 
-    <!-- ระบบเติมเงิน -->
-    <div style="margin-top: 50px; text-align: center; background: var(--bg-card); padding: 30px; border-radius: 15px; border: 1px dashed #30363d;">
-        <h3>💰 เติมเงินเข้าระบบ</h3>
-        <button class="btn btn-topup" onclick="Swal.fire('เลขบัญชี', 'กสิกร: 012-3-45678-9', 'info')">ดูเลขบัญชี</button>
-        <p>แนบสลิปเพื่อเติมเงิน (จำลอง):</p>
+    <!-- ส่วนของลูกค้า: เติมเงิน -->
+    <div style="margin-top: 60px; text-align: center; background: var(--bg-card); padding: 30px; border-radius: 15px; border: 1px dashed var(--primary-blue);">
+        <h3>💳 เติมเงินผ่านสลิป</h3>
+        <button class="btn" style="background:none; border:1px solid #58a6ff; color:#58a6ff; margin-bottom:15px;" onclick="Swal.fire('ข้อมูลธนาคาร', 'กสิกรไทย: 012-3-45678-9', 'info')">คลิกเพื่อดูเลขบัญชี</button>
+        <br>
         <input type="file" id="slip" style="max-width: 300px;">
-        <button class="btn" onclick="topup()">ยืนยันส่งสลิป</button>
+        <br>
+        <button class="btn" onclick="topup()">ยืนยันการเติมเงิน</button>
     </div>
 </div>
 
 <script>
     let balance = 0;
+    const ADMIN_PASS = "2212";
 
-    // 1. ฟังก์ชันเปลี่ยนชื่อร้าน
+    // 1. ระบบล็อกอินแอดมิน
+    async function adminLogin() {
+        const { value: password } = await Swal.fire({
+            title: 'กรอกรหัสผ่านแอดมิน',
+            input: 'password',
+            inputPlaceholder: 'Password',
+            inputAttributes: { autocapitalize: 'off', autocorrect: 'off' }
+        });
+
+        if (password === ADMIN_PASS) {
+            Swal.fire('สำเร็จ', 'ยินดีต้อนรับแอดมิน', 'success');
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('login-btn').style.display = 'none';
+            document.getElementById('logout-btn').style.display = 'block';
+        } else if (password) {
+            Swal.fire('ผิดพลาด', 'รหัสผ่านไม่ถูกต้อง!', 'error');
+        }
+    }
+
+    function adminLogout() {
+        document.getElementById('admin-panel').style.display = 'none';
+        document.getElementById('login-btn').style.display = 'block';
+        document.getElementById('logout-btn').style.display = 'none';
+        Swal.fire('Logout', 'ออกจากระบบแอดมินแล้ว', 'info');
+    }
+
+    // 2. จัดการชื่อร้าน/โลโก้
     function updateShopName() {
         const name = document.getElementById('input-shop-name').value;
         document.getElementById('display-shop-name').innerText = name || "MY SHOP";
     }
 
-    // 2. ฟังก์ชันแสดงโลโก้
     function previewLogo(event) {
         const reader = new FileReader();
         reader.onload = function() {
@@ -155,21 +188,21 @@
         reader.readAsDataURL(event.target.files[0]);
     }
 
-    // 3. ฟังก์ชันเพิ่มสินค้า
+    // 3. เพิ่มสินค้า
     function addProduct() {
         const name = document.getElementById('p-name').value;
         const price = document.getElementById('p-price').value;
         const imgInput = document.getElementById('p-img');
 
         if(!name || !price || !imgInput.files[0]) {
-            Swal.fire('ข้อมูลไม่ครบ', 'กรุณาใส่ชื่อ ราคา และเลือกรูปสินค้า', 'warning');
+            Swal.fire('เตือน', 'กรอกข้อมูลสินค้าให้ครบ', 'warning');
             return;
         }
 
         const reader = new FileReader();
         reader.onload = function() {
             const container = document.getElementById('product-display');
-            const html = `
+            container.innerHTML += `
                 <div class="product-card">
                     <img src="${reader.result}" class="product-img">
                     <div class="product-info">
@@ -179,39 +212,32 @@
                     </div>
                 </div>
             `;
-            container.innerHTML += html;
-            // ล้างค่าในช่องกรอก
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-price').value = '';
-            imgInput.value = '';
-            Swal.fire('สำเร็จ', 'เพิ่มสินค้าแล้ว!', 'success');
+            Swal.fire('เรียบร้อย', 'เพิ่มสินค้าใหม่แล้ว', 'success');
         };
         reader.readAsDataURL(imgInput.files[0]);
     }
 
-    // 4. ระบบซื้อ
+    // 4. ระบบเติมเงิน & ซื้อ
+    function topup() {
+        if(!document.getElementById('slip').files[0]) {
+            Swal.fire('หือ?', 'ลืมแนบสลิปหรือเปล่าครับ?', 'question');
+            return;
+        }
+        Swal.fire({ title: 'ตรวจสอบสลิป...', timer: 1500, didOpen: () => Swal.showLoading() }).then(() => {
+            balance += 1000;
+            document.getElementById('balance').innerText = balance.toLocaleString();
+            Swal.fire('สำเร็จ', 'ยอดเงินเข้า 1,000 ฿', 'success');
+        });
+    }
+
     function buy(cost, title) {
         if(balance < cost) {
-            Swal.fire('ยอดเงินไม่พอ', 'กรุณาเติมเงินก่อนครับ', 'error');
+            Swal.fire('เงินไม่พอ', 'กรุณาเติมเงินก่อนซื้อ ' + title, 'error');
         } else {
             balance -= cost;
             document.getElementById('balance').innerText = balance.toLocaleString();
-            Swal.fire('สั่งซื้อสำเร็จ', 'คุณได้รับ ' + title + ' แล้ว', 'success');
+            Swal.fire('ขอบคุณครับ', 'คุณซื้อ ' + title + ' สำเร็จ', 'success');
         }
-    }
-
-    // 5. ระบบเติมเงิน (จำลอง)
-    function topup() {
-        if(!document.getElementById('slip').files[0]) {
-            Swal.fire('แจ้งเตือน', 'กรุณาแนบรูปสลิปก่อน', 'warning');
-            return;
-        }
-        Swal.fire('กำลังตรวจสอบ', 'กรุณารอ 2-3 วินาที', 'info');
-        setTimeout(() => {
-            balance += 1000;
-            document.getElementById('balance').innerText = balance.toLocaleString();
-            Swal.fire('สำเร็จ', 'เติมเงินเข้า 1,000 ฿ เรียบร้อย!', 'success');
-        }, 2000);
     }
 </script>
 
